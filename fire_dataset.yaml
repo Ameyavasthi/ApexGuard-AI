@@ -1,8 +1,0 @@
-path: .  # dataset root dir
-train: images/train  # train images (relative to 'path')
-val: images/val  # val images (relative to 'path')
-
-# Fix 4: Split into separate fire and smoke classes
-names:
-  0: fire
-  1: smoke
