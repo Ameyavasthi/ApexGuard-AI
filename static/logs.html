@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ApexGuard AI — Full surveillance event log database with filtering and video playback.">
+  <title>Event Logs — ApexGuard AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <aside id="sidebar"></aside>
+
+  <div id="main-content">
+    <header class="top-header">
+      <div class="header-left">
+        <h1>Event Logs</h1>
+        <p>Complete surveillance detection database</p>
+      </div>
+      <div class="header-right">
+        <span class="header-clock" id="header-clock">00:00:00</span>
+        <a href="/" class="icon-btn" title="Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </a>
+      </div>
+    </header>
+
+    <main class="page-body">
+
+      <!-- Summary Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Logged</div>
+          <div class="stat-value" id="log-total">—</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">Animal Events</div>
+          <div class="stat-value" id="log-animals">—</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-label" style="color:var(--danger)">Fire / Smoke</div>
+          <div class="stat-value" id="log-fires">—</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-label" style="color:#ef4444">🔫 Weapons</div>
+          <div class="stat-value" id="log-weapons">—</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">Events Today</div>
+          <div class="stat-value" id="log-today">—</div>
+        </div>
+      </div>
+
+      <!-- Logs Table Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Detection Records
+          </span>
+          <div class="filter-pills">
+            <button class="filter-btn active" data-filter="ALL"    onclick="setFilter('ALL',this)">All Events</button>
+            <button class="filter-btn"        data-filter="ANIMAL" onclick="setFilter('ANIMAL',this)">🐾 Animals</button>
+            <button class="filter-btn"        data-filter="FIRE"   onclick="setFilter('FIRE',this)">🔥 Fire / Smoke</button>
+            <button class="filter-btn"        data-filter="WEAPON" onclick="setFilter('WEAPON',this)">🔫 Weapons</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Type</th>
+                <th>Label</th>
+                <th>Confidence</th>
+                <th>Snapshot</th>
+                <th>Video</th>
+              </tr>
+            </thead>
+            <tbody id="logs-body">
+              <tr class="empty-row"><td colspan="6">Loading logs…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="page-footer">
+      ApexGuard AI Surveillance System &bull; Developed by <span>Amey Avasthi</span>
+    </footer>
+  </div>
+
+  <!-- Video Modal -->
+  <div id="videoModal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-title">Video Playback</span>
+        <span class="modal-close" onclick="closeModal()">✕</span>
+      </div>
+      <div class="modal-body">
+        <div id="videoContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Modal -->
+  <div id="imgModal" class="modal-overlay" onclick="if(event.target===this)closeImgModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title">Snapshot Preview</span>
+        <span class="modal-close" onclick="closeImgModal()">✕</span>
+      </div>
+      <div class="modal-body">
+        <img id="imgPreview" src="" alt="Snapshot preview">
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/sidebar.js?v=2"></script>
+  <script>
+    "use strict";
+    initSidebar('/logs');
+
+    let currentFilter = 'ALL';
+    let allLogs = [];
+
+    async function loadLogs() {
+      try {
+        const res = await fetch('/api/logs/data');
+        allLogs = await res.json();
+        renderLogs();
+        updateStats();
+      } catch(e) {
+        document.getElementById('logs-body').innerHTML = `<tr class="empty-row"><td colspan="6">Failed to load logs. Is the backend running?</td></tr>`;
+      }
+    }
+
+    function updateStats() {
+      const animals = allLogs.filter(l => getLogType(l) === 'animal').length;
+      const fires   = allLogs.filter(l => getLogType(l) === 'fire').length;
+      const weapons = allLogs.filter(l => getLogType(l) === 'weapon').length;
+      const today   = allLogs.filter(l => {
+        try { return new Date(l.Timestamp).toDateString() === new Date().toDateString(); } catch { return false; }
+      }).length;
+      document.getElementById('log-total').textContent   = allLogs.length;
+      document.getElementById('log-animals').textContent = animals;
+      document.getElementById('log-fires').textContent   = fires;
+      const wEl = document.getElementById('log-weapons');
+      if (wEl) wEl.textContent = weapons;
+      document.getElementById('log-today').textContent   = today;
+    }
+
+    // Classify a CSV log row into 'animal' | 'fire' | 'weapon'
+    function getLogType(log) {
+      const lbl = (log['Label'] || '').toLowerCase();
+      if (lbl.includes('fire') || lbl.includes('smoke'))  return 'fire';
+      if (lbl.includes('gun')  || lbl.includes('pistol') ||
+          lbl.includes('rifle')|| lbl.includes('knife')  ||
+          lbl.includes('weapon')|| lbl.includes('scissors')) return 'weapon';
+      return 'animal';
+    }
+
+    function renderLogs() {
+      const tbody = document.getElementById('logs-body');
+      const filtered = allLogs.filter(log => {
+        if (currentFilter === 'ALL') return true;
+        return getLogType(log).toUpperCase() === currentFilter;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No logs match this filter.</td></tr>`;
+        return;
+      }
+
+      const BADGE = {
+        animal: { cls: 'badge-animal', label: '🐾 Animal' },
+        fire:   { cls: 'badge-fire',   label: '🔥 Fire'   },
+        weapon: { cls: 'badge-weapon', label: '🔫 Weapon' },
+      };
+
+      tbody.innerHTML = filtered.map(log => {
+        const logType = getLogType(log);
+        const bm     = BADGE[logType] || BADGE.animal;
+        const label  = (log['Label'] || '').trim();
+
+        const conf = parseFloat(log['Confidence'] || 0);
+        const pct  = isNaN(conf) ? 0 : (conf > 1 ? Math.round(conf) : Math.round(conf * 100));
+
+        // Snapshot
+        let snapPath = log['Snapshot Path'] || '';
+        if (snapPath.includes('/') || snapPath.includes('\\'))
+          snapPath = '/snapshots/' + snapPath.split(/[/\\]/).pop();
+        const snapHtml = snapPath
+          ? `<img class="thumb-img" src="${snapPath}" alt="snap" onerror="this.style.display='none'" onclick="openImgModal('${snapPath}')">`
+          : `<span style="color:var(--text-muted);font-size:.75rem">—</span>`;
+
+        // Video
+        let vidPath = log['Video Path'] || 'N/A';
+        let vidHtml = `<button class="btn btn-outline" style="padding:5px 10px;font-size:0.75rem;" disabled>▶ Play</button>`;
+        if (vidPath !== 'N/A') {
+          const filename = vidPath.split('\\').pop().split('/').pop();
+          // Use /api/recordings/ — serves with Accept-Ranges header needed for video seeking
+          vidHtml = `<button class="btn btn-outline" style="padding:5px 10px;font-size:0.75rem;" onclick="playVideo('/api/recordings/${filename}')">▶ Play</button>`;
+        }
+
+        return `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:var(--text-muted);">${log['Timestamp'] || '—'}</td>
+          <td><span class="badge ${bm.cls}">${bm.label}</span></td>
+          <td style="color:var(--text-primary);font-weight:500;text-transform:capitalize;">${label}</td>
+          <td><div class="conf-bar-wrap"><div class="conf-bar"><div class="conf-fill" style="width:${pct}%"></div></div><span class="conf-text">${pct}%</span></div></td>
+          <td>${snapHtml}</td>
+          <td>${vidHtml}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function setFilter(f, btn) {
+      currentFilter = f;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderLogs();
+    }
+
+    function playVideo(videoUrl) {
+      const filename = videoUrl.split(/[/\\]/).pop();
+      document.getElementById('modal-title').textContent = `📹 ${filename}`;
+      // Use /api/recordings/ for proper Content-Type + Accept-Ranges headers
+      const src = `/api/recordings/${filename}`;
+      document.getElementById('videoContainer').innerHTML =
+        `<video width="100%" controls autoplay style="max-height:70vh;outline:none;display:block;background:#000;">
+           <source src="${src}">
+           Your browser does not support the video tag.
+         </video>`;
+      document.getElementById('videoModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('videoModal').classList.remove('open');
+      document.getElementById('videoContainer').innerHTML = '';
+    }
+
+    function openImgModal(src) {
+      document.getElementById('imgPreview').src = src;
+      document.getElementById('imgModal').classList.add('open');
+    }
+    function closeImgModal() { document.getElementById('imgModal').classList.remove('open'); }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeImgModal(); } });
+
+    loadLogs();
+    setInterval(loadLogs, 15000);
+  </script>
+</body>
+</html>

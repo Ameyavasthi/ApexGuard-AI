@@ -1,0 +1,96 @@
+# ═══════════════════════════════════════════════════════════════════
+#  ApexGuard-AI  —  .gitignore
+# ═══════════════════════════════════════════════════════════════════
+
+# ── Environment & Secrets ─────────────────────────────────────────
+.env
+*.env
+!.env.example
+
+# ── Python ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# ── Virtual Environments ──────────────────────────────────────────
+venv/
+env/
+.venv/
+ENV/
+.env.bak
+
+# ── YOLO / AI Model Weights ───────────────────────────────────────
+# Large binary files — download via download_models.py
+models/*.pt
+models/*.onnx
+models/*.engine
+models/*.tflite
+
+# ── Runtime Data / Generated Files ───────────────────────────────
+detection_logs.csv
+surveillance.db
+surveillance.db-journal
+surveillance.db-shm
+surveillance.db-wal
+
+# ── Recorded Media (large files) ─────────────────────────────────
+recordings/*.mp4
+recordings/*.avi
+recordings/*.mkv
+recordings/*.webm
+
+# VS Code workspace files (machine-specific)
+*.code-workspace
+
+# Backup files
+*.backup
+snapshots/*.jpg
+snapshots/*.jpeg
+snapshots/*.png
+
+# Keep the folders themselves
+!recordings/.gitkeep
+!snapshots/.gitkeep
+
+# ── Logs ──────────────────────────────────────────────────────────
+*.log
+last_run*.log
+startup_error*.txt
+*.log.*
+
+# ── IDE / Editor ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Testing ───────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ── Jupyter ───────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── OS Generated ─────────────────────────────────────────────────
+desktop.ini
+ehthumbs.db

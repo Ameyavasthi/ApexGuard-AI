@@ -1,0 +1,22 @@
+# ── Core AI / Computer Vision ─────────────────────────────────────────────────
+ultralytics==8.2.18          # YOLOv8 — animal & fire detection
+opencv-python==4.9.0.80      # Video capture, frame processing, drawing boxes
+
+# ── Backend API ────────────────────────────────────────────────────────────────
+fastapi==0.111.0             # Modern async web framework
+uvicorn[standard]==0.29.0    # ASGI server to run FastAPI
+python-multipart==0.0.9      # Required for FastAPI file handling / form data
+
+# ── Database ───────────────────────────────────────────────────────────────────
+sqlalchemy==2.0.30           # ORM — maps Python classes to SQLite tables
+
+# ── Alert System ───────────────────────────────────────────────────────────────
+pygame==2.5.2                # Cross-platform audio — plays siren sound
+plyer==2.1.0                 # Desktop notifications (Windows/macOS/Linux)
+
+# ── Utilities ──────────────────────────────────────────────────────────────────
+python-dotenv==1.0.1         # Load .env config (optional, for extensions)
+
+# ── Testing ────────────────────────────────────────────────────────────────────
+pytest==8.2.0
+httpx==0.27.0                # Async HTTP client for FastAPI TestClient
