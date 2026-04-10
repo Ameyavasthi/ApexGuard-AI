@@ -25,10 +25,10 @@
 ![ApexGuard Main Dashboard](docs/screenshots/dashboard.png)
 
 ### 🎯 Live Detection View
-![Live Detection Stream](docs/screenshots/detection.png)
+![Live Detection Stream](docs/screenshots/ui_detection.png)
 
 ### 📋 Event Logs
-![Detection Logs](docs/screenshots/logs.png)
+![Detection Logs](docs/screenshots/ui_logs.png)
 
 ### 🔌 API Explorer (Swagger)
 ![Swagger API Docs](docs/screenshots/api_docs.png)
@@ -37,7 +37,7 @@
 
 | 🔥 Fire Detection | 🔫 Weapon Detection | 🦁 Wildlife Detection |
 |:-:|:-:|:-:|
-| ![Fire](docs/screenshots/snapshot_fire.jpg) | ![Weapon](docs/screenshots/snapshot_weapon.jpg) | ![Animal](docs/screenshots/snapshot_animal.jpg) |
+| ![Fire](docs/screenshots/demo_fire.png) | ![Weapon](docs/screenshots/demo_weapon.png) | ![Animal](docs/screenshots/demo_animal.png) |
 
 ---
 
