@@ -22,22 +22,22 @@
 ## 📸 Screenshots
 
 ### 🏠 Main Dashboard
-![ApexGuard Main Dashboard](docs/screenshots/dashboard.png)
+![ApexGuard Main Dashboard](backend/docs/screenshots/dashboard.png)
 
 ### 🎯 Live Detection View
-![Live Detection Stream](docs/screenshots/ui_detection.png)
+![Live Detection Stream](backend/docs/screenshots/ui_detection.png)
 
 ### 📋 Event Logs
-![Detection Logs](docs/screenshots/ui_logs.png)
+![Detection Logs](backend/docs/screenshots/ui_logs.png)
 
 ### 🔌 API Explorer (Swagger)
-![Swagger API Docs](docs/screenshots/api_docs.png)
+![Swagger API Docs](backend/docs/screenshots/api_docs.png)
 
 ### 🐆 Detection Snapshots in Action
 
 | 🔥 Fire Detection | 🔫 Weapon Detection | 🦁 Wildlife Detection |
 |:-:|:-:|:-:|
-| ![Fire](docs/screenshots/demo_fire.png) | ![Weapon](docs/screenshots/demo_weapon.png) | ![Animal](docs/screenshots/demo_animal.png) |
+| ![Fire](backend/docs/screenshots/demo_fire.png) | ![Weapon](backend/docs/screenshots/demo_weapon.png) | ![Animal](backend/docs/screenshots/demo_animal.png) |
 
 ---
 
@@ -161,53 +161,33 @@
 
 ```
 ApexGuard-AI/
-├── 📂 api/                          # FastAPI application layer
-│   ├── main.py                      # App entry point, lifespan, routes
-│   ├── stream.py                    # MJPEG live stream endpoint
-│   ├── database.py                  # SQLAlchemy DB init
-│   └── routes/
-│       ├── events.py                # GET /api/events
-│       ├── snapshots.py             # GET /api/snapshots
-│       └── recordings.py            # GET /api/recordings
+├── 📂 backend/                      # Python Server & Intelligence
+│   ├── 📂 api/                      # FastAPI application layer
+│   │   ├── main.py                  # App entry point
+│   │   ├── stream.py                # MJPEG stream endpoint
+│   │   ├── database.py              # DB init
+│   │   └── routes/                  # API endpoints
+│   ├── 📂 core/                     # Detection engine & logic
+│   │   ├── engine.py                # Background threat loop
+│   │   ├── alert_system.py          # Siren & notifications
+│   │   └── detectors/               # AI inference modules
+│   ├── 📂 docs/                     # Technical documentation & screenshots
+│   ├── 📂 sounds/                   # Alert audio files
+│   ├── config.py                    # Central configuration
+│   ├── start_server.py              # Production launcher
+│   └── requirements.txt             # Dependencies
 │
-├── 📂 core/                         # Detection & intelligence layer
-│   ├── engine.py                    # Main threat engine (background thread)
-│   ├── animal_detector.py           # YOLOv8 animal inference
-│   ├── fire_detector.py             # YOLOv9 fire/smoke inference
-│   ├── weapon_detector.py           # YOLOv8 weapon inference
-│   ├── alert_system.py              # Siren + desktop notifications
-│   ├── event_recorder.py            # Video clip + snapshot writer
-│   ├── event_logger.py              # SQLite + CSV logging
-│   ├── video_capture.py             # Camera abstraction (webcam/IP)
-│   ├── state_manager.py             # Global shared state (thread-safe)
-│   └── performance_manager.py       # FPS throttling & resource monitor
+├── 📂 frontend/                     # Dashboard User Interface
+│   ├── index.html                   # Main dashboard
+│   ├── style.css                    # Dark theme styles
+│   └── app.js                       # Frontend logic
 │
-├── 📂 static/                       # Frontend dashboard (SPA)
-│   ├── index.html                   # Main dashboard page
-│   ├── detect.html                  # Live detection stream page
-│   ├── logs.html                    # Event log viewer page
-│   ├── style.css                    # Global dark/cyberpunk theme
-│   ├── app.js                       # Dashboard JS logic
-│   └── sidebar.js                   # Navigation sidebar component
+├── 📂 models/                       # AI weight files (.pt)
 │
-├── 📂 models/                       # AI weight files (gitignored)
-│   ├── animal_detect.pt             # Wildlife detection model
-│   ├── fire_detect.pt               # Fire/smoke detection model
-│   └── weapon_detect.pt             # Weapon detection model
-│
-├── 📂 docs/screenshots/             # README screenshots
-├── 📂 recordings/                   # Auto-saved event clips (gitignored)
-├── 📂 snapshots/                    # Auto-saved detection frames (gitignored)
-├── 📂 sounds/                       # Alert audio files
-│
-├── config.py                        # Central config (reads from .env)
-├── start_server.py                  # Uvicorn production launcher
-├── download_models.py               # Model weight downloader
-├── requirements.txt                 # Python dependencies
-├── .env.example                     # Environment variable template ✅
-├── .env                             # Local secrets (gitignored) 🔒
-├── .gitignore                       # Git exclusions
-└── LICENSE                          # MIT License
+└── 📂 recordings_snapshots/         # Local media storage
+    ├── 📂 recordings/               # Event video clips
+    └── 📂 snapshots/                # HD detection images
+
 ```
 
 ---
