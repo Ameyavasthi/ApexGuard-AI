@@ -26,7 +26,7 @@ ANIMAL_CONFIDENCE_THRESHOLD  = _float("ANIMAL_CONFIDENCE_THRESHOLD", 0.50)
 FIRE_CONFIDENCE_THRESHOLD    = _float("FIRE_CONFIDENCE_THRESHOLD",   0.50)
 WEAPON_CONFIDENCE_THRESHOLD  = _float("WEAPON_CONFIDENCE_THRESHOLD", 0.40)
 
-DANGEROUS_ANIMALS = {"snake", "tiger", "lion", "leopard", "bear"}
+DANGEROUS_ANIMALS = {"snake", "tiger", "lion", "leopard", "bear", "wolf", "gorilla"}
 
 HARMFUL_WEAPON_LABELS = {
     "gun", "handgun", "pistol", "rifle", "revolver", "weapon",

@@ -34,7 +34,7 @@ class DetectionEngine:
         self.thread = None
 
         self.infer_every_n = max(3, getattr(config, 'INFER_EVERY_N', 5))
-        self.infer_width = getattr(config, 'INFER_WIDTH', 320)
+        self.infer_width = getattr(config, 'INFER_WIDTH', 640)
         self.stream_quality = getattr(config, 'STREAM_QUALITY', 50)
         self.target_fps = getattr(config, 'STREAM_FPS', 10)
 

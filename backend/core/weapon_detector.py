@@ -62,16 +62,17 @@ class WeaponDetector:
         try:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                if hasattr(torch.serialization, "add_safe_globals"):
-                    try:
-                        from ultralytics.nn.tasks import DetectionModel
-                        torch.serialization.add_safe_globals(
-                            ["ultralytics.nn.tasks.DetectionModel",
-                             DetectionModel]
-                        )
-                    except Exception:
-                        pass
+
+                # PyTorch 2.6+ defaults weights_only=True which breaks custom YOLO .pt files.
+                _original_torch_load = torch.load
+                def _patched_load(*args, **kwargs):
+                    kwargs.setdefault('weights_only', False)
+                    return _original_torch_load(*args, **kwargs)
+                torch.load = _patched_load
+
                 self.model = YOLO(path)
+
+                torch.load = _original_torch_load
                 self.model_label = label
                 print(f"[INFO] Weapon model loaded ({label}) ✓")
         except Exception as exc:

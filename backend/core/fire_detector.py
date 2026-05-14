@@ -20,16 +20,21 @@ class FireDetector:
             self.model_path = os.path.join(getattr(_cfg, "ROOT_DIR", getattr(_cfg, "BASE_DIR", ".")), "models", "yolov8n.pt")
 
         try:
+            import warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
 
-            if hasattr(torch.serialization, 'add_safe_globals'):
-                try:
-                    from ultralytics.nn.tasks import DetectionModel
-                    torch.serialization.add_safe_globals([DetectionModel])
-                except Exception:
-                    pass
+                # PyTorch 2.6+ defaults weights_only=True which breaks custom YOLO .pt files.
+                _original_torch_load = torch.load
+                def _patched_load(*args, **kwargs):
+                    kwargs.setdefault('weights_only', False)
+                    return _original_torch_load(*args, **kwargs)
+                torch.load = _patched_load
 
-            self.model = YOLO(self.model_path)
-            self.active = True
+                self.model = YOLO(self.model_path)
+
+                torch.load = _original_torch_load
+                self.active = True
         except Exception as e:
             print(f"[ERROR] Fire model failed to load safely: {e}")
             self.active = False
